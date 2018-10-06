@@ -1,119 +1,157 @@
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 from OpenGL.GLU import *
-import math
-
-window = 0
-rtri = 0.0
-rquad = 2.0
-speed = 0.1
-Wireframe = True
-balls = []
+import random
 
 
-def InitGL(Width, Height):
-	glClearColor(0.3, 0.3, 0.3, 0.0)
-	glClearDepth(1.0)
-	glDepthFunc(GL_LESS)
-	glEnable(GL_DEPTH_TEST)
-	glPolygonMode(GL_FRONT, GL_FILL)
-	glPolygonMode(GL_BACK, GL_FILL)
-	glShadeModel(GL_SMOOTH)
+class Ball3D:
+	def __init__(self):
+		self.balls = []
+		self.width = 600
+		self.height = 600
+		self.window = 0
+		self.depth = -10
+		self.G = 0.0005
 
-	glMatrixMode(GL_PROJECTION)
-	glLoadIdentity()
+	def init_gl(self):
+		glClearColor(0.3, 0.3, 0.3, 0.0)
+		glClearDepth(1.0)
+		glDepthFunc(GL_LESS)
+		glEnable(GL_DEPTH_TEST)
+		glPolygonMode(GL_FRONT, GL_FILL)
+		glPolygonMode(GL_BACK, GL_FILL)
+		glShadeModel(GL_SMOOTH)
 
-	gluPerspective(45.0, float(Width) / float(Height), 0.1, 100.0)
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
 
-	glMatrixMode(GL_MODELVIEW)
+		gluPerspective(45.0, float(self.width) / float(self.height), 0.1, 100.0)
 
-	glMaterialfv(GL_FRONT, GL_SPECULAR, [1, 1, 1, 1])
-	glMaterialfv(GL_FRONT, GL_SHININESS, [50])
-	glLightfv(GL_LIGHT0, GL_POSITION, [1, 1, 1, 0])
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 0, 1])
-	glLightfv(GL_LIGHT0, GL_SPECULAR, [1, 1, 0, 1])
-	glLightModelfv(GL_LIGHT_MODEL_AMBIENT, [0.1, 0.1, 0.1, 1.0])
-	glEnable(GL_LIGHTING)
-	glEnable(GL_LIGHT0)
+		glMatrixMode(GL_MODELVIEW)
+
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, [1, 1, 1, 1])
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, [1, 1, 1, 1])
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, [50])
+		glLightfv(GL_LIGHT0, GL_POSITION, [0.1, 0.1, -0.5, 0.5])
+		glLightfv(GL_LIGHT0, GL_AMBIENT, [0, 0, 0, 1])
+		glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
+		glLightfv(GL_LIGHT0, GL_SPECULAR, [1, 1, 1, 1])
+		glEnable(GL_LIGHTING)
+		glEnable(GL_LIGHT0)
+		glEnable(GL_COLOR_MATERIAL)
+
+	def display_func(self):
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+		glLoadIdentity()
+		self.balls_show()
+		self.wells_show()
+		glutSwapBuffers()
+
+	def idle_func(self):
+		self.display_func()
+
+	def balls_show(self):
+		glColor3f(0.0, 1.0, 0.0)
+		for ball in self.balls:
+			glPushMatrix()
+			glTranslate(ball[0][0], ball[0][1], ball[0][2])
+			glutSolidSphere(0.005, 20, 20)
+			glPopMatrix()
+
+	@staticmethod
+	def wells_show():
+		glColor3f(1.0, 1.0, 0.0)
+		glBegin(GL_POLYGON)
+		glVertex3f(-0.1, -0.1, -0.5)
+		glVertex3f(0.1, -0.1, -0.5)
+		glVertex3f(0.1, 0.1, -0.5)
+		glVertex3f(-0.1, 0.1, -0.5)
+		glEnd()
+
+		glColor3f(0.8, 0.5, 0.0)
+		glBegin(GL_POLYGON)
+		glVertex3f(0.1, -0.1, -0.5)
+		glVertex3f(0.1, 0.1, -0.5)
+		glVertex3f(0.1, 0.1, -0.2)
+		glVertex3f(0.1, -0.1, -0.2)
+		glEnd()
+
+		glColor3f(0.8, 0.5, 0.0)
+		glBegin(GL_POLYGON)
+		glVertex3f(-0.1, 0.1, -0.5)
+		glVertex3f(-0.1, -0.1, -0.5)
+		glVertex3f(-0.1, -0.1, -0.2)
+		glVertex3f(-0.1, 0.1, -0.2)
+		glEnd()
+
+		glColor3f(1.0, 0.5, 0.0)
+		glBegin(GL_POLYGON)
+		glVertex3f(-0.1, -0.1, -0.5)
+		glVertex3f(0.1, -0.1, -0.5)
+		glVertex3f(0.1, -0.1, -0.2)
+		glVertex3f(-0.1, -0.1, -0.2)
+		glEnd()
+
+		glColor3f(1.0, 0.5, 0.0)
+		glBegin(GL_POLYGON)
+		glVertex3f(0.1, 0.1, -0.5)
+		glVertex3f(-0.1, 0.1, -0.5)
+		glVertex3f(-0.1, 0.1, -0.2)
+		glVertex3f(0.1, 0.1, -0.2)
+		glEnd()
+
+	@staticmethod
+	def keyboard_func(*args):
+		if args[0] == b"\x1b":
+			exit()
+		print(args[0])
+
+	def mouse_func(self, *args):
+		if args[0] == 0 and args[1] == 1:
+			x, y, _ = gluUnProject(args[2], args[3], -0.1)
+			self.balls.append([[x, -y, -0.1], [random.randint(-10, 10)/1000, 0.0, -0.01]])
+			print(x, y)
+		print(args)
+
+	def timer_func(self, id):
+		del_list = []
+		for ball in self.balls:
+			print(ball)
+			if ball[0][0] < -0.1 or ball[0][0] > 0.1:
+				ball[1][0] = -ball[1][0]
+			if ball[0][1] < -0.1 or ball[0][1] > 0.1:
+				ball[1][1] = -ball[1][1]-self.G
+			if ball[0][2] < -0.5:
+				ball[1][2] = -ball[1][2]
+			if ball[0][2] > 0.0:
+				del_list.append(self.balls.index(ball))
+			for i in range(3):
+				ball[0][i] += ball[1][i]
+			ball[1][1] -= self.G
+		for i in del_list:
+			self.balls.pop(i)
+		glutTimerFunc(30, self.timer_func, 1)
+
+	def reshape_func(self, *args):
+		glutReshapeWindow(self.width, self.height)
+
+	def run(self):
+		glutInit()
+		glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
+		glutInitWindowSize(self.width, self.height)
+		glutInitWindowPosition(0, 0)
+		self.window = glutCreateWindow(b"Balls")
+		glutDisplayFunc(self.display_func)
+		glutIdleFunc(self.idle_func)
+		glutReshapeFunc(self.reshape_func)
+		glutKeyboardFunc(self.keyboard_func)
+		glutMouseFunc(self.mouse_func)
+		glutTimerFunc(30, self.timer_func, 1)
+		self.init_gl()
+		glutMainLoop()
 
 
-def ReSizeGLScene(Width, Height):
-	if Height == 0:
-		Height = 1
-
-	glViewport(0, 0, Width, Height)
-	glMatrixMode(GL_PROJECTION)
-	glLoadIdentity()
-	gluPerspective(45.0, float(Width) / float(Height), 0.1, 100.0)
-	glMatrixMode(GL_MODELVIEW)
-
-
-
-
-def DrawGLScene():
-	global rtri, rquad, speed, balls
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-	glLoadIdentity()
-	#for ball in balls:
-
-	glTranslatef(0.0, 0.0, -10.0)
-	glutSolidSphere(1.0, 50, 50)
-	glTranslatef(5.0, 0.0, 0.0)
-	glutSolidSphere(1.0, 50, 50)
-	glTranslatef(-10.0, 0.0, 0.0)
-	glutSolidSphere(1.0, 50, 50)
-
-	rtri = rtri + 0.2
-	rquad = rquad - 0.15
-	glutSwapBuffers()
-
-
-def keyPressed(*args):
-	global rquad
-	if args[0] == b"x":
-		global Wireframe
-		if Wireframe == False:
-			glPolygonMode(GL_FRONT, GL_LINE)
-			glPolygonMode(GL_BACK, GL_LINE)
-			Wireframe = True
-		elif Wireframe == True:
-			glPolygonMode(GL_FRONT, GL_FILL)
-			glPolygonMode(GL_BACK, GL_FILL)
-			Wireframe = False
-		else:
-			pass
-	elif args[0] == b"\x1b":
-		exit()
-	elif args[0] == b"v":
-		rquad = 2
-		print(rquad)
-
-	print(args[0])
-
-
-def mousePressed(*args):
-	if args[0] == 0 and args[1] == 1:
-		global balls
-		balls.append((args[2], args[3]))
-
-
-def main():
-	global window
-	glutInit()
-	glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH)
-	glutInitWindowSize(800, 500)
-	glutInitWindowPosition(0, 0)
-	window = glutCreateWindow(b"Balls")
-	glutDisplayFunc(DrawGLScene)
-	glutIdleFunc(DrawGLScene)
-	glutReshapeFunc(ReSizeGLScene)
-	glutKeyboardFunc(keyPressed)
-	glutMouseFunc(mousePressed)
-	InitGL(640, 480)
-	glutMainLoop()
-
-
-print("Press esc to exit")
-main()
-
+if __name__ == '__main__':
+	main = Ball3D()
+	print("Press esc to exit")
+	main.run()
