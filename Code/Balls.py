@@ -117,7 +117,7 @@ class Ball3D:
 	def timer_func(self, id):
 		del_list = []
 		for ball in self.balls:
-			print(ball)
+			#print(ball)
 			if ball[0][0] < -0.1 or ball[0][0] > 0.1:
 				ball[1][0] = -ball[1][0]
 			if ball[0][1] < -0.1 or ball[0][1] > 0.1:
