@@ -12,6 +12,7 @@ class Ball3D:
 		self.window = 0
 		self.depth = -10
 		self.G = 0.0005
+		self.V = -0.001
 
 	def init_gl(self):
 		glClearColor(0.3, 0.3, 0.3, 0.0)
@@ -109,7 +110,7 @@ class Ball3D:
 	def mouse_func(self, *args):
 		if args[0] == 0 and args[1] == 1:
 			x, y, _ = gluUnProject(args[2], args[3], -0.1)
-			self.balls.append([[x, -y, -0.1], [random.randint(-10, 10)/1000, 0.0, -0.01], (random.randint(0, 10)/10, random.randint(0, 10)/10, random.randint(0, 10)/10)])
+			self.balls.append([[x, -y, -0.1], [random.randint(-10, 10)/1000, 0.0, self.V], (random.randint(0, 10)/10, random.randint(0, 10)/10, random.randint(0, 10)/10)])
 			print(x, y)
 		print(args)
 
