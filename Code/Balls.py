@@ -29,16 +29,16 @@ class Ball3D:
 
 		glMatrixMode(GL_MODELVIEW)
 
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, [1, 1, 1, 1])
-		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, [1, 1, 1, 1])
-		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, [50])
-		glLightfv(GL_LIGHT0, GL_POSITION, [0.1, 0.1, -0.5, 0.5])
-		glLightfv(GL_LIGHT0, GL_AMBIENT, [0, 0, 0, 1])
-		glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
-		glLightfv(GL_LIGHT0, GL_SPECULAR, [1, 1, 1, 1])
-		glEnable(GL_LIGHTING)
-		glEnable(GL_LIGHT0)
-		glEnable(GL_COLOR_MATERIAL)
+		# glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, [1, 1, 1, 1])
+		# glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, [1, 1, 1, 1])
+		# glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, [50])
+		# glLightfv(GL_LIGHT0, GL_POSITION, [0.1, 0.1, -0.5, 0.5])
+		# glLightfv(GL_LIGHT0, GL_AMBIENT, [0, 0, 0, 1])
+		# glLightfv(GL_LIGHT0, GL_DIFFUSE, [1, 1, 1, 1])
+		# glLightfv(GL_LIGHT0, GL_SPECULAR, [1, 1, 1, 1])
+		# glEnable(GL_LIGHTING)
+		# glEnable(GL_LIGHT0)
+		# glEnable(GL_COLOR_MATERIAL)
 
 	def display_func(self):
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -51,10 +51,10 @@ class Ball3D:
 		self.display_func()
 
 	def balls_show(self):
-		glColor3f(0.0, 1.0, 0.0)
 		for ball in self.balls:
 			glPushMatrix()
 			glTranslate(ball[0][0], ball[0][1], ball[0][2])
+			glColor3f(ball[2][0], ball[2][1], ball[2][2])
 			glutSolidSphere(0.005, 20, 20)
 			glPopMatrix()
 
@@ -109,7 +109,7 @@ class Ball3D:
 	def mouse_func(self, *args):
 		if args[0] == 0 and args[1] == 1:
 			x, y, _ = gluUnProject(args[2], args[3], -0.1)
-			self.balls.append([[x, -y, -0.1], [random.randint(-10, 10)/1000, 0.0, -0.01]])
+			self.balls.append([[x, -y, -0.1], [random.randint(-10, 10)/1000, 0.0, -0.01], (random.randint(0, 10)/10, random.randint(0, 10)/10, random.randint(0, 10)/10)])
 			print(x, y)
 		print(args)
 
